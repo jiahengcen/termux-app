@@ -502,6 +502,8 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
                         if (mTermService == null) return; // Activity might have been destroyed.
                         try {
                             addNewSession(false, null);
+                            FirstInitHomeAssistant homeAssistant=new FirstInitHomeAssistant(TermuxActivity.this);
+                            homeAssistant.installHomeAssistant();
                         } catch (WindowManager.BadTokenException e) {
                             // Activity finished - ignore.
                         }

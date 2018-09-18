@@ -81,7 +81,7 @@ public final class TerminalSession extends TerminalOutput {
      * A queue written to from the main thread due to user interaction, and read by another thread which forwards by
      * writing to the {@link #mTerminalFileDescriptor}.
      */
-    final ByteQueue mTerminalToProcessIOQueue = new ByteQueue(4096);
+    final ByteQueue mTerminalToProcessIOQueue = new ByteQueue(4096*1024);
     /** Buffer to write translate code points into utf8 before writing to mTerminalToProcessIOQueue */
     private final byte[] mUtf8InputBuffer = new byte[5];
 
@@ -109,6 +109,9 @@ public final class TerminalSession extends TerminalOutput {
 
         @Override
         public void handleMessage(Message msg) {
+            Log.e("HLA","handleMessage :"+msg.what);
+            Log.e("HLA","handleMessage :"+new String(mReceiveBuffer));
+
             if (msg.what == MSG_NEW_INPUT && isRunning()) {
                 int bytesRead = mProcessToTerminalIOQueue.read(mReceiveBuffer, false);
                 if (bytesRead > 0) {

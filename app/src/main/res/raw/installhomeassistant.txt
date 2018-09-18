@@ -1,0 +1,29 @@
+apt update
+apt install nano
+apt install clang
+apt install python python-dev python2 python2-dev
+pip install --upgrade pip
+pip install BeautifulSoup4 requests
+apt install  libxml2-dev libxslt-dev libcrypt-dev openssl-dev libffi-dev
+pip install lxml
+pip install sqlalchemy
+pip install aiohttp_cors
+pip install home-assistant-frontend
+
+pip install distro
+pip install fuzzywuzzy
+pip install netdisco
+
+#pip install xmltodict
+#curl -L https://its-pointless.github.io/setup-pointless-repo.sh | sh
+#pkg install scipy
+#pip install numpy matplotlib pandas
+#apt install aarch64-linux-android-clang
+pip install aiohttp
+pkg install libcrypt-dev
+pkg install libffi-dev
+pip install cryptography
+pip install homeassistant
+
+hass
+

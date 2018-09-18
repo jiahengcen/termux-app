@@ -9,3 +9,4 @@
 
 -renamesourcefileattribute SourceFile
 -keepattributes SourceFile,LineNumberTable
+-keep class com.hzy.lib7z.** { *; }
