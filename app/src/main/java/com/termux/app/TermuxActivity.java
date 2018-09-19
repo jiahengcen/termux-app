@@ -502,6 +502,7 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
                         if (mTermService == null) return; // Activity might have been destroyed.
                         try {
                             addNewSession(false, null);
+
                         } catch (WindowManager.BadTokenException e) {
                             // Activity finished - ignore.
                         }

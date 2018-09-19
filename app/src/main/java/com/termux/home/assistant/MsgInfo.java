@@ -1,4 +1,4 @@
-package com.termux.app;
+package com.termux.home.assistant;
 
 /**
  * Created by HZY on 2017/11/25.

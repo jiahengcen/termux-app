@@ -16,6 +16,7 @@
 
     <application
         android:extractNativeLibs="true"
+        android:name=".home.assistant.BaseApplication"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backupscheme"
         android:icon="@mipmap/ic_launcher"
@@ -28,7 +29,7 @@
         <!-- This (or rather, value 2.1 or higher) is needed to make the Samsung Galaxy S8
              mark the app with "This app is optimized to run in full screen." -->
         <meta-data android:name="android.max_aspect" android:value="10.0" />
-        <activity android:name=".app.TermuxToolsActivity"  android:theme="@style/ToolsTheme">
+        <activity android:name=".home.assistant.TermuxToolsActivity"  android:theme="@style/ToolsTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,4 +1,4 @@
-package com.termux.app;
+package com.termux.home.assistant;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.termux.R;
+import com.termux.app.TermuxActivity;
 import com.termux.un7zip.ExtractCallback;
 import com.termux.un7zip.Z7Extractor;
 
@@ -23,7 +24,10 @@ import io.reactivex.Flowable;
 import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import io.reactivex.internal.functions.Functions;
+import io.reactivex.internal.operators.flowable.FlowableInternalHelper;
 import io.reactivex.schedulers.Schedulers;
 
 public class TermuxToolsActivity extends AppCompatActivity {
@@ -91,15 +95,28 @@ public class TermuxToolsActivity extends AppCompatActivity {
                             mProgressDialog.setMessage(msgInfo.msg);
                             break;
                         case 2:
+                            Log.e(TAG, msgInfo.msg);
                             Toast.makeText(TermuxToolsActivity.this, msgInfo.msg, Toast.LENGTH_SHORT).show();
                             break;
                         case 3:
+                            Log.e(TAG, msgInfo.msg);
                             Toast.makeText(TermuxToolsActivity.this, msgInfo.msg, Toast.LENGTH_SHORT).show();
-                            mProgressDialog.dismiss();
+
                             break;
                     }
                 }
-            });
+            }, Functions.ERROR_CONSUMER, new Action() {
+                @Override
+                public void run() throws Exception {
+                    Preference.saveInstallService(TermuxToolsActivity.this, true);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mProgressDialog.dismiss();
+                        }
+                    });
+                }
+            }, FlowableInternalHelper.RequestMax.INSTANCE);
     }
 
     @OnClick(R.id.button_start_service)

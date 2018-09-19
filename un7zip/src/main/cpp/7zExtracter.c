@@ -133,19 +133,19 @@ extractStream(JNIEnv *env, ISeekInStream *seekStream, const char *destDir,
                         MyCreateDir(name, destDir);
                         continue;
                     } else if (OutFile_OpenUtf16(&outFile, destPath, destDir)) {
-                        PrintError("can not open output file");
+                        PrintError("can not open output file-1");
                         res = SZ_ERROR_FAIL;
                         break;
                     }
                     processedSize = outSizeProcessed;
                     if (File_Write(&outFile, outBuffer + offset, &processedSize) != 0 ||
                         processedSize != outSizeProcessed) {
-                        PrintError("can not write output file");
+                        PrintError("can not write output file-2");
                         res = SZ_ERROR_FAIL;
                         break;
                     }
                     if (File_Close(&outFile)) {
-                        PrintError("can not close output file");
+                        PrintError("can not close output file-3");
                         res = SZ_ERROR_FAIL;
                         break;
                     }
