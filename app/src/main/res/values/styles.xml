@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="ToolsTheme" parent="Theme.AppCompat.Light.DarkActionBar"/>
 
     <!-- See https://developer.android.com/training/material/theme.html for how to customize the Material theme. -->
     <!-- NOTE: Cannot use "Light." since it hides the terminal scrollbar on the default black background. -->

@@ -17,6 +17,7 @@ import android.view.WindowManager;
 
 import com.termux.R;
 import com.termux.terminal.EmulatorDebug;
+import com.termux.un7zip.Z7Extractor;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,6 +53,81 @@ import java.util.zip.ZipInputStream;
  */
 final class TermuxInstaller {
 
+    static void setupIfNeededNew(final Activity activity, final Runnable whenDone){
+        // Termux can only be run as the primary user (device owner) since only that
+        // account has the expected file system paths. Verify that:
+        UserManager um = (UserManager) activity.getSystemService(Context.USER_SERVICE);
+        boolean isPrimaryUser = um.getSerialNumberForUser(android.os.Process.myUserHandle()) == 0;
+        if (!isPrimaryUser) {
+            new AlertDialog.Builder(activity).setTitle(R.string.bootstrap_error_title).setMessage(R.string.bootstrap_error_not_primary_user_message)
+                .setOnDismissListener(new OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        System.exit(0);
+                    }
+                }).setPositiveButton(android.R.string.ok, null).show();
+            return;
+        }
+
+        final File PREFIX_FILE = new File(TermuxService.PREFIX_PATH);
+        if (PREFIX_FILE.isDirectory()) {
+            whenDone.run();
+            return;
+        }
+
+        final ProgressDialog progress = ProgressDialog.show(activity, null, activity.getString(R.string.bootstrap_installer_body), true, false);
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    //TODO this is for unZip package
+                    //Z7Extractor.extractFile(null, null, null);
+                        activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            whenDone.run();
+                        }
+                    });
+                } catch (final Exception e) {
+                    Log.e(EmulatorDebug.LOG_TAG, "Bootstrap error", e);
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                new AlertDialog.Builder(activity).setTitle(R.string.bootstrap_error_title).setMessage(R.string.bootstrap_error_body)
+                                    .setNegativeButton(R.string.bootstrap_error_abort, new OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                            activity.finish();
+                                        }
+                                    }).setPositiveButton(R.string.bootstrap_error_try_again, new OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        TermuxInstaller.setupIfNeededNew(activity, whenDone);
+                                    }
+                                }).show();
+                            } catch (WindowManager.BadTokenException e) {
+                                // Activity already dismissed - ignore.
+                            }
+                        }
+                    });
+                } finally {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                progress.dismiss();
+                            } catch (RuntimeException e) {
+                                // Activity already dismissed - ignore.
+                            }
+                        }
+                    });
+                }
+            }
+        }.start();
+    }
     /** Performs setup if necessary. */
     static void setupIfNeeded(final Activity activity, final Runnable whenDone) {
         // Termux can only be run as the primary user (device owner) since only that
@@ -69,7 +145,7 @@ final class TermuxInstaller {
             return;
         }
 
-        final File PREFIX_FILE = new File(TermuxService.PREFIX_PATH);
+       final File PREFIX_FILE = new File(TermuxService.PREFIX_PATH);
         if (PREFIX_FILE.isDirectory()) {
             whenDone.run();
             return;
