@@ -502,9 +502,10 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
                     public void run() {
                         if (mTermService == null) return; // Activity might have been destroyed.
                         try {
+                            Log.e("HLA","setupIfNeeded Runnable ...... ");
                             addNewSession(false, null);
                             FirstInitHomeAssistant assistant=new FirstInitHomeAssistant(TermuxActivity.this);
-                            assistant.startInstallService();
+                            assistant.start();
                         } catch (WindowManager.BadTokenException e) {
                             // Activity finished - ignore.
                         }
@@ -522,11 +523,12 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
             } else {
                 switchToSession(getStoredCurrentSessionOrLast());
             }
-            FirstInitHomeAssistant assistant=new FirstInitHomeAssistant(TermuxActivity.this);
-            assistant.startHomeAssistant();
+            Log.e("HLA","setupIfNeeded llllll ...... ");
         }
     }
-
+    public TermuxService getTermService(){
+        return mTermService;
+    }
     public void switchToSession(boolean forward) {
         TerminalSession currentSession = getCurrentTermSession();
         int index = mTermService.getSessions().indexOf(currentSession);
@@ -640,7 +642,7 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
     }
 
     /** Try switching to session and note about it, but do nothing if already displaying the session. */
-    void switchToSession(TerminalSession session) {
+    public void switchToSession(TerminalSession session) {
         if (mTerminalView.attachSession(session)) {
             noteSessionInfo();
             updateBackgroundColor();

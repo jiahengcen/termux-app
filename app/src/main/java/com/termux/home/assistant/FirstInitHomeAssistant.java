@@ -3,6 +3,8 @@ package com.termux.home.assistant;
 import android.app.ProgressDialog;
 import android.os.Handler;
 import android.os.Looper;
+import android.system.ErrnoException;
+import android.system.Os;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -15,6 +17,7 @@ import com.termux.un7zip.Z7Extractor;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,6 +33,7 @@ import io.reactivex.internal.functions.Functions;
 import io.reactivex.internal.operators.flowable.FlowableInternalHelper;
 import io.reactivex.schedulers.Schedulers;
 
+
 public class FirstInitHomeAssistant {
     private static final String TAG = FirstInitHomeAssistant.class.getSimpleName();
 
@@ -41,6 +45,7 @@ public class FirstInitHomeAssistant {
     }
 
     public void startHomeAssistant() {
+        Log.e("HLC","startHomeAssistant:111");
         if (!Preference.hasInstallService()) return;
         int retry = 0;
         while (activity.getCurrentTermSession() == null && retry++ < 10) {
@@ -50,20 +55,31 @@ public class FirstInitHomeAssistant {
                 e.printStackTrace();
             }
         }
-        if (!Preference.hasRunChmod()) {
-            runChmod();
-            Preference.saveRunChmod(activity, true);
+        TerminalSession terminalSession=activity.getCurrentTermSession();
+        if(terminalSession!=null){
+            terminalSession.finishIfRunning();
         }
-        if (!checkHassRun()) {
-            if (activity.getCurrentTermSession() == null) {
-                activity.addNewSession(false, "HomeAssistant");
-                mainHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        runHass();
-                        Preference.saveHassRun(activity, true);
+        activity.addNewSession(false, "HomeAssistant");
+        activity.removeFinishedSession(terminalSession);
+        runHass();
+        Log.e("HLC","startHomeAssistant:4444");
+        Preference.saveHassRun(activity, true);
+    }
+
+    private void OsRunChmod() {
+        File file=new File(activity.getFilesDir(),"/usr/bin");
+        if(file.exists()&&file.isDirectory()){
+            File[] fls=file.listFiles();
+            for(File file1:fls){
+                if(file1.isFile()){
+                    Log.e("HLC","file:"+file1.getAbsolutePath());
+                    try {
+                        Os.chmod(file1.getAbsolutePath(), 0777);
+                    } catch (ErrnoException e) {
+                        Log.e("HLC","error:"+e.getMessage());
+                        e.printStackTrace();
                     }
-                }, 100);
+                }
             }
         }
     }
@@ -115,6 +131,7 @@ public class FirstInitHomeAssistant {
     }
 
     public void startInstallService() {
+
         activity.runOnUiThread(new Runnable() {
             ProgressDialog mProgressDialog;
 
@@ -170,7 +187,21 @@ public class FirstInitHomeAssistant {
                                 @Override
                                 public void run() {
                                     Preference.saveInstallService(activity, true);
-                                    startHomeAssistant();
+                                    if (!Preference.hasRunChmod()) {
+                                        Log.e("HLC","startHomeAssistant:2222");
+                                        OsRunChmod();
+                                        if(activity.getCurrentTermSession()!=null){
+                                            activity.getCurrentTermSession().finishIfRunning();
+                                        }
+                                        //runChmod();
+                                        Preference.saveRunChmod(activity, true);
+                                    }
+                                    mainHandler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            startHomeAssistant();
+                                        }
+                                    },100);
                                     mProgressDialog.dismiss();
                                 }
                             });
@@ -182,6 +213,14 @@ public class FirstInitHomeAssistant {
 
     public static void onApplicationFinish(BaseApplication baseApplication) {
         Preference.saveHassRun(baseApplication, false);
+    }
+
+    public void start() {
+        if(!Preference.hasInstallService()){
+            startInstallService();
+        }else{
+            startHomeAssistant();
+        }
     }
 
     public interface HassRun {
