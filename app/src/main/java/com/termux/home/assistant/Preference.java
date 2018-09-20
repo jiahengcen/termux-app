@@ -10,6 +10,7 @@ public class Preference {
      * 由于解压缩后的文件没有执行权限，所以给可以执行的权限
      */
     private static final String HAS_RUN_CHOMD = "chmod_bin";
+    private static final String IS_HASS_RUNNING = "hass_running";
 
     public static boolean hasInstallService() {
         SharedPreferences sharedPreferences = BaseApplication.baseContext.getSharedPreferences(CONFIG_FILE, Context.MODE_PRIVATE);
@@ -40,6 +41,14 @@ public class Preference {
         SharedPreferences sharedPreferences = context.getSharedPreferences(CONFIG_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(key, value);
-        editor.apply();
+        editor.commit();
+    }
+
+    public static void saveHassRun(Context context, boolean b) {
+        save(context,IS_HASS_RUNNING,b);
+    }
+    public static boolean isHassRunning(){
+        SharedPreferences sharedPreferences = BaseApplication.baseContext.getSharedPreferences(CONFIG_FILE, Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean(IS_HASS_RUNNING, false);
     }
 }

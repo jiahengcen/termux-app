@@ -10,4 +10,10 @@ public class BaseApplication extends Application {
         super.onCreate();
         baseContext=this;
     }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        FirstInitHomeAssistant.onApplicationFinish(this);
+    }
 }

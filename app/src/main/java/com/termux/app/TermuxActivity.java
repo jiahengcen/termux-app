@@ -60,6 +60,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.termux.R;
+import com.termux.home.assistant.FirstInitHomeAssistant;
 import com.termux.terminal.EmulatorDebug;
 import com.termux.terminal.TerminalColors;
 import com.termux.terminal.TerminalSession;
@@ -502,7 +503,8 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
                         if (mTermService == null) return; // Activity might have been destroyed.
                         try {
                             addNewSession(false, null);
-
+                            FirstInitHomeAssistant assistant=new FirstInitHomeAssistant(TermuxActivity.this);
+                            assistant.startInstallService();
                         } catch (WindowManager.BadTokenException e) {
                             // Activity finished - ignore.
                         }
@@ -520,6 +522,8 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
             } else {
                 switchToSession(getStoredCurrentSessionOrLast());
             }
+            FirstInitHomeAssistant assistant=new FirstInitHomeAssistant(TermuxActivity.this);
+            assistant.startHomeAssistant();
         }
     }
 
@@ -552,7 +556,7 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
     }
 
     @Nullable
-    TerminalSession getCurrentTermSession() {
+    public TerminalSession getCurrentTermSession() {
         return mTerminalView.getCurrentSession();
     }
 
@@ -608,7 +612,7 @@ public final class TermuxActivity extends Activity implements ServiceConnection 
         return (DrawerLayout) findViewById(R.id.drawer_layout);
     }
 
-    void addNewSession(boolean failSafe, String sessionName) {
+    public void addNewSession(boolean failSafe, String sessionName) {
         if (mTermService.getSessions().size() >= MAX_SESSIONS) {
             new AlertDialog.Builder(this).setTitle(R.string.max_terminals_reached_title).setMessage(R.string.max_terminals_reached_message)
                 .setPositiveButton(android.R.string.ok, null).show();
