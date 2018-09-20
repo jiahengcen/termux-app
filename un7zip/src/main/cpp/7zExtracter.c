@@ -135,7 +135,19 @@ extractStream(JNIEnv *env, ISeekInStream *seekStream, const char *destDir,
                     } else if (OutFile_OpenUtf16(&outFile, destPath, destDir)) {
                         PrintError("can not open output file-1");
                         res = SZ_ERROR_FAIL;
-                        break;
+                        //?-- fix has no permission cause unzip stop  --@start{
+                        //--before-->>{
+                        //break;
+                        //}
+                        //--after-->>{
+                        if (File_Close(&outFile)) {
+                            PrintError("can not close output file-3");
+                            res = SZ_ERROR_FAIL;
+                            break;
+                        }
+                        continue;
+                        // }
+                        //?-- fix has no permission cause unzip stop  --@end}
                     }
                     processedSize = outSizeProcessed;
                     if (File_Write(&outFile, outBuffer + offset, &processedSize) != 0 ||
